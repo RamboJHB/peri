@@ -9,7 +9,7 @@
 
 
 
-#include "gpio_setup.c"
+#include "mygpio.h"
 
 int  gpio_read ( int gpio , int *buf){
     snprintf(buf,sizeof(buf),GPIO_VALUE( gpio_base, gpio));

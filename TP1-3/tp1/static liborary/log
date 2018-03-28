@@ -1,0 +1,7 @@
+
+gcc -c gpio_read.c gpio_setup.c gpio_write.c gpio_config.c mygpio.h
+
+ar rcs libmygpio.a *.o *.h
+
+gcc -o test main.c -static -L. -lmygpio     
+

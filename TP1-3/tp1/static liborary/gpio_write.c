@@ -8,9 +8,9 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
+#include "mygpio.h"
 
 
-#include "gpio_setup.c"
 
 void gpio_write ( int gpio_number , int val )
 {

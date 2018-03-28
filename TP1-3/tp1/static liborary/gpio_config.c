@@ -7,7 +7,7 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-
+#include "mygpio.h"
 /*
  * Base of peripherals and base of GPIO controller.
  */
@@ -23,8 +23,8 @@
 #define RPI_BLOCK_SIZE          4096
 
 
-static int mmap_fd;
-static uint32_t volatile * gpio_base = 0;
+//static int mmap_fd;
+//static uint32_t volatile * gpio_base = 0;
 
 int gpio_init ()
 {

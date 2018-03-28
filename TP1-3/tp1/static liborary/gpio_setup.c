@@ -20,7 +20,7 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-#include "gpio_config.c"
+#include "mygpio.h"
 /*
  * Base of peripherals and base of GPIO controller.
  */

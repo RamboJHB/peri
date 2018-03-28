@@ -24,7 +24,7 @@
  * Main program.
  */
 
-#include "libgpio.h"
+#include "mygpio.h"
 
 #define GPIO_LED0   4
 #define GPIO_LED1   17
