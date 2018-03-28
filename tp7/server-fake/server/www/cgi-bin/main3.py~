@@ -1,0 +1,13 @@
+#!/usr/bin/env python
+
+html="""
+<head>
+  <title>Peri Web Server</title>
+</head>
+<body>
+VAR:<br/>
+DATE:<br/>
+</body>
+"""
+
+print html
