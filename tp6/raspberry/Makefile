@@ -1,7 +1,7 @@
-RPI?=26
+RPI?=22
 SRC=src
-APP=blinktest
-DST=huang-jiang
+APP=NRF24L01_base
+DST=Jiang_Lee
 
 CROSSDIR        = /users/enseig/franck/peri
 CROSS_COMPILE   = $(CROSSDIR)/arm-bcm2708hardfp-linux-gnueabi/bin/bcm2708hardfp-

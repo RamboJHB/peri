@@ -1,7 +1,7 @@
-RPI?=26
+RPI?=22
 SRC=src
-APP=fake
-DST=xu-wang/tp7
+APP=NRF24L01_base
+DST=Jiang_Lee
 
 CROSSDIR        = /users/enseig/franck/peri
 CROSS_COMPILE   = $(CROSSDIR)/arm-bcm2708hardfp-linux-gnueabi/bin/bcm2708hardfp-
@@ -11,8 +11,7 @@ LIB=$(HOME)/rf24/lib
 CFLAGS=-Wall -Wfatal-errors -O2 -I$(INC)
 LDFLAGS=-L$(LIB) -lrf24
 
-all:
-	$(APP).x
+all:  $(APP).x
 
 $(APP).x: $(APP).cpp
 	$(CROSS_COMPILE)g++ -o $@ -I$(INC) $<  -O2 $(LDFLAGS)
@@ -22,4 +21,3 @@ upload:
 
 clean:
 	rm -f *.o *.x *~
-	rm $(APP) *~ f2s s2f 2> /dev/null || true
