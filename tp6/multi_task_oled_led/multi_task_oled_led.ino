@@ -14,7 +14,7 @@
 //  - nombre de période écoulée depuis le dernier appel
 // --------------------------------------------------------------------------------------------------------------------
 
-//-----------------------OLED----------------------------
+//-----------------------OLED lib----------------------------
 #include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -28,6 +28,9 @@ Adafruit_SSD1306 display(OLED_RESET);
 #define DELTAY 2
 #define LOGO16_GLCD_HEIGHT 16 
 #define LOGO16_GLCD_WIDTH  16 
+
+
+//-----------------------OLED set up----------------------------
 static const unsigned char PROGMEM logo16_glcd_bmp[] =
 { B00000000, B11000000,
   B00000001, B11000000,
@@ -56,7 +59,7 @@ unsigned int cpt = 0;
 
 /********************************************************
  *********************************************************
- * Communications timer
+ *  timer
 **********************************************************
 *********************************************************/
 
@@ -145,7 +148,7 @@ void loop_Mess(struct Mess_st *ctx) {
 
 /********************************************************
  *********************************************************
- * Communications inter-tâches
+ *  inter-tâches
 **********************************************************
 *********************************************************/
 enum state  {EMPTY, FULL};
@@ -166,7 +169,7 @@ void setup_T2() {
   // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C); // initialize with the I2C addr 0x3C (for the 128x32)
 
-   // Show image buffer on the display hardware.
+  // Show image buffer on the display hardware.
   // Since the buffer is intialized with an Adafruit splashscreen
   // internally, this will display the splashscreen.
   display.display();
@@ -207,36 +210,26 @@ void loop_T3_LED(struct mailbox_st* mb) {
     digitalWrite(13, LOW);flag =false;
   }              
 }
-//--------- Setup et Loop---------------------------------------------------
 
-
-/*
- * 
+//--------- Setup et Loop---------------------------------------------------//
 //--------- Déclaration des tâches
 
-struct Led_st Led1;
-struct Mess_st Mess1;
-
-void setup() {
-  //period 1s = 1000000
-  setup_Led(&Led1, 0, 1500000, 13);                        // Led est exécutée toutes les 1s 
-  setup_Mess(&Mess1, 1, 2000000, "OMG WTF");              // Mess est exécutée toutes les 2,5 secondes 
-}
-
-void loop() {
-  loop_Led(&Led1);                                        
-  loop_Mess(&Mess1); 
-}
-*/
+//struct Led_st Led1;
+//struct Mess_st Mess1;
 struct mailbox_st mb0;
 
 void setup() {
+  //period 1s = 1000000
+  //setup_Led(&Led1, 0, 1500000, 13);                        // Led est exécutée toutes les 1s 
+  //setup_Mess(&Mess1, 1, 2000000, "OMG WTF");              // Mess est exécutée toutes les 2,5 secondes 
   setup_T1(&mb0,0);                        // Led est exécutée toutes les 1s 
   setup_T2();              // Mess est exécutée toutes les 2,5 secondes 
   setup_T3(&mb0); 
 }
 
 void loop() {
+  //loop_Led(&Led1);                                        
+  //loop_Mess(&Mess1); 
   loop_T1_sender(&mb0);                                        
   loop_T2_reciever(&mb0);
   loop_T3_LED(&mb0);
