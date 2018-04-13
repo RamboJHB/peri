@@ -131,9 +131,9 @@ void loop_send_dis(struct mailbox_st* mb){
   
   display.display();
     if (!radio.write( &mb->val, sizeof(int) )){
-      Serial.println(F("failed."));      
+      Serial.println(F("failed."));  //pass flash-memory based strings to Serial.print() by wrapping them with F()
   }else{
-      Serial.print("sent ");
+      Serial.print(F("sent "));
   }
   mb->stt = EMPTY;
 }
