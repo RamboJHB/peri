@@ -20,6 +20,7 @@
 
 typedef uint8_t byte;
 
+
 using namespace std;
 
 RF24 radio(15,8); // radio(CE,CS)
@@ -61,29 +62,23 @@ int main(int argc, char **argv)
     perror("failed fopen");exit(-1);
   }
   if ((s2f = open("/tmp/s2f_JL", O_RDWR))<0) {
-	perror("s2f open failed\n");
+	perror("s2f open failed");
 	exit(1);
-  }// fifo openning
-  while (fgets(buf,64,fp)!=0){        //count lines already existed
-    if(buf[strlen(buf)-1]=='\n')
-      line++;
   }
-    setup();
 
-do{
-    time(&t);
+  setup();
+
+  do{
+    t = time(0);
     //sscanf(ctime(&t),"%[^\n]",time_str);
-    //printf("%s,%d\n",time_str,val);
-    //strftime(time_sec, 128, "%S",localtime(&t));
-    //fprintf(fp,"%s,%d\n",time_sec,rand_val+1000);
-
-  if( radio.available()){
-    radio.read( &val, sizeof(int) ); // Get the payload
-    fprintf(fp,"%d,%d\n",line++,val);//write in file log_in
-    fflush(fp);
-    cout << "received: ";
-    cout <<val<<endl;// for printing val "\n" is obligate!!!! why????????????????????????
-      }
+	//cout<< time_str << endl;
+    if( radio.available()){
+      radio.read( &val, sizeof(int) ); // Get the payload
+      fprintf(fp,"%u,%d\n",t,val);//write in file log_in
+      fflush(fp);
+      //cout << "received: ";
+      //cout <<val<<endl;// for printing val "\n" is obligate!!!! why????????????????????????
+    }
     FD_ZERO(&rfds);                                     // erase all flags
     FD_SET(s2f, &rfds);                                 // wait for s2f
     FD_SET(STDIN_FILENO, &rfds);                        // wait for stdin
@@ -93,22 +88,11 @@ do{
         if (FD_ISSET(s2f, &rfds)) {                     // something to read
             if ((nbchar = read(s2f, serverRequest, MAXServerResquest)) == 0) break;
             serverRequest[nbchar]=0;
-            fprintf(stderr,"from sever ---------gate_way execution time = %s seconds\n", serverRequest);
+            fprintf(stderr,"mesg from sever : %s \n", serverRequest);
 	        memset(serverRequest, 0, sizeof(serverRequest) );
         }
     }
-    sleep(1);
-
   }while(1);
   fclose(fp);
   return 0;
-
-
-
-
-
-
-    while (1)
-
-    return 0;
 }

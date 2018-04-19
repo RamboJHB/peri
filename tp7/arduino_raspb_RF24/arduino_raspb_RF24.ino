@@ -103,7 +103,7 @@ void setup_oled() {
 }
   
 void loop_cap(struct mailbox_st* mb) {
-  if ( !(waitFor(3,1500000))) return;
+  if ( !(waitFor(3,500000))) return;
   if (mb->stt != EMPTY) return; // attend que la mailbox soit vide
   mb->val =analogRead(15);        //----------------------------read capturer lumiere PIN15
   //radio.write( &mb->val, sizeof(mb->val) ); // send to raspb
@@ -131,9 +131,9 @@ void loop_send_dis(struct mailbox_st* mb){
   
   display.display();
     if (!radio.write( &mb->val, sizeof(int) )){
-      Serial.println(F("failed."));  //pass flash-memory based strings to Serial.print() by wrapping them with F()
+      Serial.println(F("failed."));      
   }else{
-      Serial.print(F("sent "));
+      Serial.print("sent ");
   }
   mb->stt = EMPTY;
 }

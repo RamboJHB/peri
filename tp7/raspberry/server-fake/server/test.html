@@ -1,5 +1,5 @@
 <head>
-  <meta http-equiv="refresh" content="1">
+  <!– – meta http-equiv="refresh" content="1" – –>
   <title align="center">test</title>
 </head>
 <h1 align="center">TP4_JL</h1>
@@ -10,43 +10,68 @@ LeDs oh lalala:<br/>
   <input name="val" cols="20"></input>
   <input type="submit" value="Entrer">
 </form>
-
- <head>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart']});
+<head>
+   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+   <script type="text/javascript">
+      google.charts.load('current', {'packages':['gauge','corechart']});
       google.charts.setOnLoadCallback(drawChart);
 
       function drawChart() {
+
         var data = google.visualization.arrayToDataTable([
-          ['TIME', 'Val'],
-          ['0',  2],
-          ['5',  3],
-          ['10',  4],
-          ['15',  660],
-          ['20',  660],
-          ['25',  660],
-          ['30',  2],
-          ['35',  660],
-          ['40',  660],
-          ['45',  10],
-          ['50',  660],
-          ['55',  660],
-          ['60',  660]
+          ['Label', 'Value'],
+          ['Brightness', 80],
         ]);
 
         var options = {
-          title: 'Lumiere Value of the Capture lalala',
-          hAxis: {title: 'time',  titleTextStyle: {color: '#333'}},
-          vAxis: {minValue: 0}
+          width: 200, height: 200,
+          redFrom: 850, redTo: 1000,
+          yellowFrom:500, yellowTo:850,
+          minorTicks: 5,
+          max: 1000
         };
 
-        var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
+        var chart = new google.visualization.Gauge(document.getElementById('gauge_chart'));
+
         chart.draw(data, options);
+
+        setInterval(function() {
+          data.setValue(0, 1,1000);
+          chart.draw(data, options);
+        }, 13000);
+
       }
     </script>
-  </head>
-  <body>
-    <div id="chart_div" style="width: 100%; height: 500px;"></div>
+
+
+</head>
+
+<body>
+    <div id="gauge_chart" style="width: 200px; height: 200px"></div>
+    <div id="area_chart" style="width: 100%; height: 500px;"></div>
+        <script type="text/javascript">
+		google.charts.setOnLoadCallback(drawChart);
+    
+    function drawChart() {
+    var data = google.visualization.arrayToDataTable([
+    ['TIME', 'Val'],
+    [new Date(1212121), 1000],
+    [new Date(1212122), 100],
+    [new Date(1212123), 200],
+    [new Date(1212124), 230],
+    [new Date(1212125), 1110],
+
+    ]);
+    
+    var options = {
+    title: 'Lumiere Value of the Capture lalala',
+    hAxis: {title: 'time(seconds)',  titleTextStyle: {color: '#333'}},
+    vAxis: {minValue: 0}
+    };
+    
+    var chart = new google.visualization.AreaChart(document.getElementById('area_chart'));
+    chart.draw(data, options);
+    }
+	</script>
   </body>
 </body>

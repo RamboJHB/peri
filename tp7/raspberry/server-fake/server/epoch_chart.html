@@ -1,0 +1,30 @@
+<html>
+ <div id="chart" class="styles1"></div>
+<button id="toggle">Switch Styles</button>
+<script>
+  var chart = $('#chart').epoch({
+    type: 'time.area',
+    data: []
+  });
+
+  // The button swtiches the chart's class from styles1 to styles2 and back
+  $('#toggle').click(function (e) {
+    // This switches the class names...
+    var className = $('#chart').attr('class');
+    var newClassName = className === 'styles1' ? 'styles2' : 'styles1';
+    $('#chart').removeClass(className).addClass(newClassName);
+
+    // And this is required to see the updated styles...
+    chart.redraw();
+  });
+</script>
+  <body>
+<div id="gaugeChart" class="epoch gauge-small"></div>
+<script>
+  $('#gaugeChart').epoch({
+    type: 'time.gauge',
+    value: 0.5
+  });
+</script>
+  </body>
+</html>
