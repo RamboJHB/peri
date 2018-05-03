@@ -6,28 +6,44 @@ Li 		3770906
 **Dans quel répertoire est créée la fifo ?**
 Ils sont créés dans /tmp(temporary directory) par open() ou mkfifo.
 **Quelle différence mkfifo et open ?**
+
+
 |open|mkfifo|
 |--|--|
 | open or create a file for R/W  |create a new fifo file(pipe)|
 | return a file descriptor if succeed|  return 0 if succeed|
 | for multiple type of files  |  just for making named pipe|
 | int open(const char *path, int oflag, ...); |   int mkfifo(const char *path, mode_t mode);|
+
+
 **Pourquoi tester que la fifo existe ?**
+
 Si le nom de fifo déjà existe:
+
 C : mkfifo() génère l'erreur : [EEXIST]The named file exists.
+
 Python : os.mkfifo() génère : OSError : [Errno 17] File exists.
+
 **À quoi sert flush ?**
+
 The function flush forces a write of all buffered data for the given output or update stream via the stream's underlying write function.  The open status of the stream is unaffected. 
+
  **Pourquoi ne ferme-t-on pas la fifo ?**
+ 
  La taille de un fifo est toujours 0B. Et l'OS vide le /tmp de temps en temps automatiquement.
+ 
 **Que fait readline() ?**
+
 **fileObject.readline( size )** : Il est dans blibliothèque python OS. Sa fonction est de rendre une ligne de fichier.( termine à '\n' ). Donc quand on doit envoyer un '\n' pour chaque fois.
 
+
 **Pour quoi  lorsque le vous lancer un écrivain (en C ou en Pyhton) rien ne se passe tant que vous n'avez pas lancé un lecteur?**
+
 En c , on execute writer , et alors reader. Parce que quand on lance write le process block au **second** write() , le fifo est plein à ce moment. Apres on lance reader , read() vide le fifo ,et les 2 process continuent.
 
 
 **P.S.** On modifie write.c comme ci-dessous:
+
 ```C
 //write(fd, "end\n", sizeof("end")); //change to
 write(fd, "end\n", sizeof("end\n"));

@@ -83,16 +83,25 @@ void lcd_set_cursor(int x, int y){
 3.Affichage du monitoring système
 ------------------------------------------------------------------
 **Question: Ecrivez un programme qui lit le contenu du fichier /proc/loadavg et qui affiche son contenu sur l'afficheur avec une fréquence d'actualisation de 1 seconde**
+
 Les fonction principales : *read()* , *lcd_message()*
+
 **Parser le contenu du fichier /proc/loadavg pour afficher des valeurs plus facilement compréhensibles.**
+
 Les fonction principales :
+
 *lseek(fd , 0, SEEK_SET);*
 *read(fd , buf ,64);*
 *strtok(buf , s);*
+
 **----Veuillez regarder les codes pour les questions ci-dessus.**
+
+
 4.Driver basique pour le LCD 
 -------------------------------------------------------
+
 On modifie la driver du TP2:
+
 ```C
 //------------------------------------------------------------------------------
 //                                Functions
@@ -132,5 +141,6 @@ struct file_operations lcd_fops ={
 
 
 Puis les invoquer dans les fonctions du driver:
+
 
 **----Veuillez regarder le code pour les questions ci-dessus.**
