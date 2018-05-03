@@ -103,7 +103,7 @@ void setup_oled() {
 }
   
 void loop_cap(struct mailbox_st* mb) {
-  if ( !(waitFor(3,500000))) return;
+  if ( !(waitFor(3,100000))) return;
   if (mb->stt != EMPTY) return; // attend que la mailbox soit vide
   mb->val =analogRead(15);        //----------------------------read capturer lumiere PIN15
   //radio.write( &mb->val, sizeof(mb->val) ); // send to raspb

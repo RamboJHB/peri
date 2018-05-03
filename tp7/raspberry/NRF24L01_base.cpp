@@ -52,8 +52,8 @@ int main(int argc, char **argv)
   char    serverRequest[MAXServerResquest];               // buffer for the request
   fd_set  rfds;                                           // flag for select
   struct  timeval tv;                                     // timeout
-  tv.tv_sec = 1;                                          // 1 second
-  tv.tv_usec = 0;                                         //
+  tv.tv_sec = 0;                                          // 
+  tv.tv_usec = 100;                                         //
 
   mkfifo("/tmp/s2f_JL", 0666);                                  // fifo creation
 
@@ -70,19 +70,19 @@ int main(int argc, char **argv)
 
   do{
     t = time(0);
+    t+=1500000500;
     //sscanf(ctime(&t),"%[^\n]",time_str);
 	//cout<< time_str << endl;
     if( radio.available()){
       radio.read( &val, sizeof(int) ); // Get the payload
-      fprintf(fp,"%u,%d\n",t,val);//write in file log_in
+      fprintf(fp,"%u,%d\n",t,val);//write in file log_in//------------------------csv file
       fflush(fp);
-      //cout << "received: ";
-      //cout <<val<<endl;// for printing val "\n" is obligate!!!! why????????????????????????
+      //cout << "received: ";cout <<val<<endl;// for printing val "\n" is obligate!!!! why????????????????????????
     }
-    FD_ZERO(&rfds);                                     // erase all flags
+    /*FD_ZERO(&rfds);                                     // erase all flags
     FD_SET(s2f, &rfds);                                 // wait for s2f
     FD_SET(STDIN_FILENO, &rfds);                        // wait for stdin
-    if (select(s2f+1, &rfds, NULL, NULL, &tv) != 0) {   // wait until timeout=1s
+    if (select(s2f+1, &rfds, NULL, NULL, &tv) != 0) {   // wait until timeout=100 us
         int nbchar;
         //read server to fake pip
         if (FD_ISSET(s2f, &rfds)) {                     // something to read
@@ -91,7 +91,7 @@ int main(int argc, char **argv)
             fprintf(stderr,"mesg from sever : %s \n", serverRequest);
 	        memset(serverRequest, 0, sizeof(serverRequest) );
         }
-    }
+    }*/
   }while(1);
   fclose(fp);
   return 0;

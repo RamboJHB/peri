@@ -6,8 +6,8 @@ f = open('./log_in', 'r')
 s = f.readlines()
 begin = 0
 end =len(s)
-if end > 120 :
-    begin = end - 120
+if end > 360 :
+    begin = end - 360
 
 s2fName = '/tmp/s2f_JL'
 if not os.path.exists(s2fName):

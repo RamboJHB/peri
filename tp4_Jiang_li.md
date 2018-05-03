@@ -81,9 +81,13 @@ On modifie le fake.c pour le execute sur Raspberry et controller les LEDs et le 
 **Common Gateway Interface**
 Au lieu d'envoyer le contenu d'un fichier (fichier HTML, image), le serveur HTTP exécute un programme , puis retourne le contenu généré.
 On écrite le server en python , et dedans il faut importer les blibliothèques :
+
+
 | BaseHTTPServer |CGIHTTPServer  |cgitb|
 |--|--|--|
 | serveur sur un port défini à la création | gestionnaire pour l'exécution des cgi |les erreurs des scripts cgi|
+
+
 ```python
 cgitb.enable()
 server = BaseHTTPServer.HTTPServer #Création du serveur HTTP 
