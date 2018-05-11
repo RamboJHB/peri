@@ -176,7 +176,7 @@ void routine_linear_filter(int size, int amplitude, char *filename, char *dst_pa
     // -- filtre moyenneur -- fir_average
     // ----------------------
 FIR:
-    radius = 2; // <- parametre a faire varier
+    radius = 9; // <- parametre a faire varier
     printf("radius = %d\n", radius);
     
     // -- calcul flottant
@@ -218,8 +218,8 @@ FIR:
     ndigit = 2; // codage sur 2 chiffre de la valeur de sigma dans le nom du fichier
     
     sigma_gauss = 0.5f; // <- parametre a faire varier
-    sigma_gauss = 1.0f;
-    sigma_gauss = 1.4f;
+    //sigma_gauss = 1.0f;
+    //sigma_gauss = 1.4f;
     fir_gauss_f32(X, size, sigma_gauss, Y);
     psnr = psnr_ui8vector(X0, 0, size-1, Y);
     printf("G(s=%.1f) PSNR = %6.2f db\n", sigma_gauss, psnr);
@@ -232,10 +232,11 @@ FIR:
     // -- filtre recursif --
     // ---------------------
  IIR:
- 
+    printf("IIR:\n");
+
     alpha = 0.8;  // alpha [0.5 : 1.0] = lissage fort / lissage faible
-    alpha = 0.6;
-    alpha = 0.4;
+    //alpha = 0.6;
+    //alpha = 0.4;
     iir_f32(X, size, alpha, Y); // sur 8 bits
     psnr = psnr_ui8vector(X0, 0, size-1, Y);
     printf("IIR(alpha=%.1f) PSNR = %6.2f db\n", alpha, psnr);

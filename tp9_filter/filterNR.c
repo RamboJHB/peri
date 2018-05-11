@@ -241,8 +241,6 @@ void fir_average_i16(uint8 *X, int n, int radius, uint8 *Y)
     T = ui8vector(0-radius, n-1+radius);
     dup_ui8vector(X, 0, n-1, T);
     extend_ui8vector(T, 0, n-1, radius); // duplication des bords
-
-    //zero_ui8vector(Y, 0, n-1); // ligne de code a supprimer
     
     // CODE A COMPLETER ICI
     for(i = 0; i < n; i++) {
@@ -258,13 +256,13 @@ void fir_average_i16(uint8 *X, int n, int radius, uint8 *Y)
     free_ui8vector(T, 0-radius, n-1+radius); //free tmp table
 }
 // ---------------------------------------------------------------
-void fir_average_q16(uint8 *X, int n, int radius, int q, uint8 *Y)//-----1/d = lamda / 2^q 
+void fir_average_q16(uint8 *X, int n, int radius, int q, uint8 *Y)//-----1/d = lambda / 2^q
 // ---------------------------------------------------------------
 {
     // normalisation par fraction equivalente
     int i, di;
     int d = 2*radius+1; // diametre du filtre
-    uint16 s, y, lamda =( 1 << q )/ d; // d = 5 lamda = 51 ;
+    uint16 s, y, lambda =( 1 << q )/ d; // d = 5 lambda = 51 ;
     uint8 *T; // tmp table with edge
     
     // allocation et copie dans un tableau temporaire avec bords
@@ -280,7 +278,7 @@ void fir_average_q16(uint8 *X, int n, int radius, int q, uint8 *Y)//-----1/d = l
             s += T[i+di];
         }
         //y = s / d; 
-		y = ( lamda*s + (1 << (q-1))) >> q;
+		y = ( lambda *s + (1 << (q-1))) >> q;
         Y[i] = (uint8)y; 
     }
     free_ui8vector(T, 0-radius, n-1+radius);
@@ -337,12 +335,12 @@ void iir_f32(uint8 *X, int n, float32 alpha, uint8 *Y)
         x0 = X[i];
         y0 = b0 * x0 + a1 * y1 + a2 * y2;
         
-        if(y0 <   0.0f) y0 =   0.0f;
-        if(y0 > 255.0f) y0 = 255.0f;
+        if(y0 <   0.0f) y0 =   0;
+        if(y0 > 255.0f) y0 = 255;
         
         Y[i] = (uint8) lroundf(y0);
         y2 = y1; y1 = y0;
-	printf("y[%d]=%f ",i,y0);
+        printf("y[%d]=%f ",i,y0);
     }
     printf("\n");
 }
@@ -354,18 +352,21 @@ void iir_q16(uint8 *X, int n, float32 alpha, int q, uint8 *Y)
     int i;
     int radius = 2;
     sint16 Q = 1 << q;//   Q = 2^q
+    sint16 QQ = Q >> 1;//   Q = 2^(q-1)
 
-    sint16 x0, y1, y2;
-    float32 y0;
+    sint16 x0, y0, y1, y2;
 
     float32 gamma = exp(-alpha);
     float32 b0= (1.0f - gamma) * (1.0f - gamma);
     float32 a1 = 2.0f * gamma; 
     float32 a2 = - gamma * gamma;
     
-    sint16 B0 = Q*(sint16)b0; 
-    sint16 A1 = Q*(sint16)a1;
-    sint16 A2 = Q*(sint16)a2;
+    //sint32 B0 = Q*(sint32)b0;
+    //sint32 A1 = Q*(sint32)a1;
+    //sint32 A2 = Q*(sint32)a2;
+    sint16 B0 = (sint16)b0 << q;
+    sint16 A1 = (sint16)a1 << q;
+    sint16 A2 = (sint16)a2 << q;
     
     uint8 *T; // tableau temporaire avec bords
 
@@ -374,15 +375,15 @@ void iir_q16(uint8 *X, int n, float32 alpha, int q, uint8 *Y)
     for(i = 0; i < n; i++) {
         
         x0 = (sint16) X[i];
-	// y0 = (2^q * b0 * x0 + 2^q * a1 * y1 + 2^q * a2 * y2 )/ 2^q        
+	    // y0 = (2^q * b0 * x0 + 2^q * a1 * y1 + 2^q * a2 * y2 )/ 2^q
                 
-	y0 = (B0 * x0 + A1 * y1 + A2 * y2)/Q;
-        if(y0 <   0.0f) y0 =   0.0f;
-        if(y0 > 255.0f) y0 = 255.0f;
+        y0 = (B0 * x0 + A1 * y1 + A2 * y2 + QQ )>>q;
+        if(y0 <   0) y0 =   0;
+        if(y0 > 255) y0 = 255;
         
-        Y[i] = (uint8) lroundf(y0);
+        Y[i] = (uint8)y0;
         y2 = y1; y1 = y0;
-	printf("y[%d]=%f ",i,y0);
+	    printf("y[%d]=%hd ",i,y0);
     }   
     printf("\n");
 }
@@ -394,19 +395,20 @@ void iir_q32(uint8 *X, int n, float32 alpha, int q, uint8 *Y)
     int i;
     int radius = 2;
     sint32 Q = 1 << q;//   Q = 2^q
-    sint32 Q_Q = Q << q;
+    sint32 QQ = Q << q;
+    sint32 QQQ = Q >> 1 ;
 
-    sint32 x0, y1, y2;
-    float32 y0;
+    sint32 x0, y0, y1, y2;
 
     float32 gamma = exp(-alpha);
     float32 b0= (1.0f - gamma) * (1.0f - gamma);
     float32 a1 = 2.0f * gamma; 
     float32 a2 = - gamma * gamma;
     
-    sint32 B0 = Q*(sint32)b0; 
-    sint32 A1 = Q*(sint32)a1;
-    sint32 A2 = Q*(sint32)a2;
+
+    sint32 B0 = (sint32)b0 << q;
+    sint32 A1 = (sint32)a1 << q;
+    sint32 A2 = (sint32)a2 << q;
     
     uint8 *T; // tableau temporaire avec bords
 
@@ -415,15 +417,19 @@ void iir_q32(uint8 *X, int n, float32 alpha, int q, uint8 *Y)
     for(i = 0; i < n; i++) {
         
         x0 = (sint32) X[i];
-	// y0 = (2^q * b0 * x0 + 2^q * a1 * y1 + 2^q * a2 * y2 )/ 2^q        
+        sint32 X0 = (sint32)x0 << q;
+        sint32 Y1 = (sint32)y1 << q;
+        sint32 Y2 = (sint32)y2 << q;
+	    // y0 = (2^q * b0 * x0 + 2^q * a1 * y1 + 2^q * a2 * y2 )/ 2^q
                 
-	y0 = (B0 * Q * x0 + A1 * Q * y1 + A2 * Q * y2)/Q_Q;
-        if(y0 <   0.0f) y0 =   0.0f;
-        if(y0 > 255.0f) y0 = 255.0f;
-        
-        Y[i] = (uint8) lroundf(y0);
+        y0 = (B0 * X0 + A1 * Y1 + A2 * Y2 + QQQ )/QQ;
+        if(y0 <   0) y0 =   0;
+        if(y0 > 255) y0 = 255;
+
+        printf("y[%d]=%d ",i,y0);
+        Y[i] = (uint8)y0;
         y2 = y1; y1 = y0;
-	printf("y[%d]=%f ",i,y0);
+	    
     } 
     printf("\n");
 }
