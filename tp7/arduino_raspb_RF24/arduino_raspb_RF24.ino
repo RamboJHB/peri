@@ -93,7 +93,8 @@ void setup_RF24(){
   radio.begin();
   radio.setPALevel(RF24_PA_HIGH);
   radio.openWritingPipe(addresses[0]);
-  Serial.println("ici");
+  radio.setChannel(99);
+  Serial.println("setting up");
   radio.printDetails();
 }
 void setup_oled() {
@@ -103,10 +104,12 @@ void setup_oled() {
 }
   
 void loop_cap(struct mailbox_st* mb) {
-  if ( !(waitFor(3,100000))) return;
+  if ( !(waitFor(3,1500000))) return;
   if (mb->stt != EMPTY) return; // attend que la mailbox soit vide
   mb->val =analogRead(15);        //----------------------------read capturer lumiere PIN15
   //radio.write( &mb->val, sizeof(mb->val) ); // send to raspb
+  Serial.print(F("read:"));Serial.print(mb->val);Serial.print(F("\n"));
+
   mb->stt = FULL;
 }
 
@@ -130,10 +133,11 @@ void loop_send_dis(struct mailbox_st* mb){
   display.print(" "); display.print(mb->mess);
   
   display.display();
-    if (!radio.write( &mb->val, sizeof(int) )){
+  
+  if (!radio.write( &mb->val, sizeof(int) )){
       Serial.println(F("failed."));      
   }else{
-      Serial.print("sent ");
+      Serial.print(F("send:"));Serial.print(mb->val);Serial.print(F("\n"));
   }
   mb->stt = EMPTY;
 }
