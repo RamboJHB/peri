@@ -32,6 +32,7 @@ void setup() {
   radio.setRetries(15,15);
   radio.setPALevel(RF24_PA_HIGH);
   radio.openReadingPipe(1,addresses[0]);
+  radio.setChannel(99);
   radio.startListening();
   radio.printDetails();
 }
@@ -67,17 +68,22 @@ int main(int argc, char **argv)
   }
 
   setup();
-
+/*
+*Integer value representing the number of milliseconds since 
+*January 1, 1970, 00:00:00 UTC, with leap seconds ignored 
+*(Unix Epoch; but consider that most Unix timestamp functions count in seconds).
+*/
   do{
     t = time(0);
-    t+=1500000500;
+    t =(t + 1487770887)*100;
     //sscanf(ctime(&t),"%[^\n]",time_str);
 	//cout<< time_str << endl;
     if( radio.available()){
       radio.read( &val, sizeof(int) ); // Get the payload
+      
       fprintf(fp,"%u,%d\n",t,val);//write in file log_in//------------------------csv file
       fflush(fp);
-      //cout << "received: ";cout <<val<<endl;// for printing val "\n" is obligate!!!! why????????????????????????
+      cout << "received: ";cout <<val<<endl;// for printing val "\n" is obligate!!!! why????????????????????????
     }
     /*FD_ZERO(&rfds);                                     // erase all flags
     FD_SET(s2f, &rfds);                                 // wait for s2f
