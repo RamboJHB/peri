@@ -1,0 +1,5 @@
+#!/bin/bash
+
+gcc -O3 rpi_dmaio_dmx512_cycle_test.c -o rpi_dmaio_dmx512_cycle_test -lpigpio -lrt -lpthread
+
+gcc -O3 rpi_dmaio_dmx512_cycle_channels.c -o rpi_dmaio_dmx512_cycle_channels -lpigpio -lrt -lpthread
