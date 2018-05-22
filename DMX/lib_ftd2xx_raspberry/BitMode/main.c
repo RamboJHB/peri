@@ -8,7 +8,7 @@
  *     sudo ./bitmode [port number]
  */
 #include <stdio.h>
-#include "../ftd2xx.h"
+#include "ftd2xx.h"
 
 
 

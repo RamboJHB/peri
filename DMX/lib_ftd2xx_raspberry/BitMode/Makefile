@@ -13,7 +13,7 @@ LINKER_OPTIONS := -Wl,-rpath /usr/local/lib
 
 CFLAGS = -Wall -Wextra $(DEPENDENCIES) $(LINKER_OPTIONS) -L/usr/local/lib
 
-APP = write
+APP = b
 
 all: $(APP)
 
