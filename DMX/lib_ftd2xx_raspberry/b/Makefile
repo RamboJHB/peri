@@ -13,7 +13,7 @@ LINKER_OPTIONS := -Wl,-rpath /usr/local/lib
 
 CFLAGS = -Wall -Wextra $(DEPENDENCIES) $(LINKER_OPTIONS) -L/usr/local/lib
 
-APP = write
+APP = b
 
 all: $(APP)
 
@@ -21,7 +21,7 @@ $(APP): main.c
 	$(CC) main.c -o $(APP) $(CFLAGS)
 
 test: bitbang.c	
-	$(CC) bitbang.c -o bitbang $(CFLAGS)	
+	$(CC) $(APP).c -o bitbang $(CFLAGS)	
 	
 clean:
 	-rm -f *.o ; rm $(APP)
