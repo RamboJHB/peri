@@ -83,7 +83,7 @@ void send_zero(void){
     FT_Write(ftHandle, 0, sizeof(TxBuffer), &BytesWritten);
     print_IO_state();
 }
-void
+
 void print_IO_state(void){
     FT_GetBitMode(ftHandle, &BitMode);
     printf ("Pins =0x%x \n", BitMode);
