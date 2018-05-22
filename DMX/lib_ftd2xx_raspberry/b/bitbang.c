@@ -17,7 +17,7 @@ FT_STATUS ftStatus;
 DWORD BytesWritten;
 UCHAR TxBuffer[1] ;
 
-static UCHAR pan;   //0-255
+static UCHAR pan;   //0-255 0x000000000 - 0x11111111
 static UCHAR tilt;  //0-255
 static UCHAR ctrl; //0-7 008-134
 static UCHAR red; //
