@@ -28,7 +28,7 @@ int        baudRate = -1; // Rate to actually use
 int        rates[] = {50, 75, 110, 134, 150, 200,
     300, 600, 1200, 1800, 2400, 4800,
     9600, 19200, 38400, 57600, 115200,
-    230400, 460800, 576000, 921600};
+    230400, 460800, 576000, 921600, 10000000};
 
 /****************************************************************/
 
@@ -166,8 +166,10 @@ int main(int argc, char *argv[])
 {
     bool flag_r = true;
 
-    
-    
+    UCHAR test = 2;
+
+    send_data(test);
+    printf("\n");
     if (argc > 1)   sscanf(argv[1], "%d", &portNum);
     // Missing, or invalid.  Just use first port.
     if (portNum < 0)   portNum = 0;
