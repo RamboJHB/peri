@@ -9,6 +9,7 @@
 
 #define BIT(b,n)   (((n)>>(b))&1) // BIT(3, 0x000100) return 1
 
+#define timeout 2
 
 #define ARRAY_SIZE(x) sizeof((x))/sizeof((x)[0])
 
@@ -228,6 +229,7 @@ int main(int argc, char *argv[])
         goto exit;
     }
     
+    
     ftStatus = FT_SetDataCharacteristics(ftHandle,
                                          FT_BITS_8,
                                          FT_STOP_BITS_1,
@@ -262,7 +264,7 @@ int main(int argc, char *argv[])
         goto exit;
     }
     
-    ftStatus = FT_SetTimeouts(ftHandle, 3000, 3000);    // 3 seconds
+    ftStatus = FT_SetTimeouts(ftHandle, 3000, timeout);
     if (ftStatus != FT_OK)
     {
         printf("Failure.  FT_SetTimeouts returned %d\n", (int)ftStatus);

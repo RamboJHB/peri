@@ -1,0 +1,236 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>projet  DMX</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="i-introduction">I Introduction</h1>
+<p>Projet DMX s’agit de réaliser un système permettant de commander un ensemble de projecteurs compatible avec le bus DMX512, le bus standard du spectacle. Il peut être utilisé dans le cadre d’animations de soirée, de spectacle.</p>
+<p>La communication est implémentée par une carde Raspberry, une ligne de FTDI USB-RS422 cable et une lumières de la scène. Pour produire la signal, il y a 3 solutions,  en utilisant une bibliothèque de FTDI ou en en créent une pilote de périphérique.</p>
+<p>图一</p>
+<h1 id="ii-raspberry-pi--os-linux">II Raspberry Pi &amp; OS linux</h1>
+<p>La carte Raspberry Pi est composée d’un système sur puce (System-on-Chip, SoC) BCM2835 de chez Broadcom. Elle offre de nombreuses possibilités pour développer des applications embarquées.</p>
+<h2 id="raspberry-pi">Raspberry Pi</h2>
+<p>Le Raspberry Pi est un nano-ordinateur de la taille d’une carte. La carde Raspberry Pi a le  noyau de système d’exploitation Linux. Je utilise la Raspberry Pi 3 Modèle B dans ce projet.</p>
+<h2 id="basic-linux-command-line--compilateur">Basic linux command line &amp; Compilateur</h2>
+<p>Dans ce projet je utilise plusieurs commands de Linux pour ranger des documents, compilation, exécution, etc. Ci-joint les commands qui sont ultilisés souvent:</p>
+<ul>
+<li>cd - entrer dans le répertoire</li>
+<li>ls - visualise les fichiers d’un répertoire</li>
+<li>mkdir - crée un répertoire</li>
+<li>pwd - affiche le chemin du répertoire courant</li>
+<li>lsmod - liste de module</li>
+<li>rmmod - décharge module</li>
+<li>insmod - charge module</li>
+<li>minor - make device special file</li>
+<li>sudo - en superuser mode</li>
+</ul>
+<p>Puis, pour la compilation, il faut 2 oultis: <strong>CMake</strong> et <strong>Make</strong>. <strong>Make</strong> est un logiciel qui construit automatiquement des fichiers exécutables ou des bibliothèques à partir d’éléments de base tels que du code source. Il utilise des fichiers appelés <strong>makefile</strong> qui spécifient comment construire les fichiers cibles.</p>
+<p><strong>CMake</strong> est un moteur de production. Il est comparable au programme make dans le sens où le processus de construction logicielle est entièrement contrôlé par des fichiers de configuration, appelés CMakeLists.txt dans le cas de CMake. Mais CMake ne produit pas directement le logiciel final, il s’occupe de la génération de fichiers de construction standards makefiles sous Unix.</p>
+<h2 id="kernel--driver-linux">Kernel &amp; Driver linux</h2>
+<p>Le noyau est le cœur du système, c’est lui qui s’occupe de fournir aux logiciels une interface de programmation pour utiliser le matériel.RaspberryPi utilise une distribution de GNU/linux nommée Raspian</p>
+<p>–  Fournit une abstraction du matériel :</p>
+<ul>
+<li>Bibliothèque système (ex: libc)</li>
+<li>Le noyaux</li>
+<li>Les pilotes de périphériques</li>
+</ul>
+<p>– Permet un usage sûr du matériel</p>
+<ul>
+<li>Vérifie la légalité des requêtes des app.</li>
+</ul>
+<p>– Permet le partage entre</p>
+<ul>
+<li>Plusieurs applications grâce à la mémoire vituelle</li>
+<li>Plusieurs utilisateurs</li>
+</ul>
+<p>图五</p>
+<h1 id="iii-protocole-dmx512">III Protocole DMX512</h1>
+<p>Le contrôle de la lumière et des éclairages fait partie des techniques essentielles de la représentation et de la mise en scène d’espaces physiques et d’espaces temps racontant une histoire ou mettant en valeur une pratique artistique sur scène.</p>
+<p>La commande se fait généralement à l’aide de pupitre, ou console DMX. Cet appareil peut être plus ou moins complexe, et gérer à lui tout seul un spectacle complet, et plusieurs lignes DMX (donc par exemple 1024, 1536, 2048… (n fois 512) canaux). On parle alors d’univers DMX, un univers possédant 512 canaux.</p>
+<h2 id="serial-communication">Serial Communication</h2>
+<p>La transmission série est la modalité de transmission de données dans laquelle les éléments d’information se succèdent, les uns après les autres, sur une seule voie entre deux points. Elle s’oppose à la transmission parallèle, qui transmet simultanément les éléments d’information sur plusieurs voies</p>
+<h2 id="dmx-protocol">DMX Protocol</h2>
+<p>La tension de la voie est un signal continu bipolaire qui donne une forme de courant alternatif. Les inversions de tensions sont instantanées ce qui donne un signal pulsé. La durée de l’impulsion dans chaque sens fournit le codage du signal :Pour définir un bit de ‘1’ ou ‘0’, la durée est  2 μs.<br>
+Le packet est comme ci-joint:</p>
+<p>图二</p>
+<ul>
+<li>high - 1800 us - Mark Time Between Frames</li>
+<li>low - 176 us - break</li>
+<li>high - 88 us - Mark-After-Break</li>
+<li>First package 00000000011</li>
+<li>data package ( start bit 0 - data - stop bits 11)</li>
+</ul>
+<p>图三</p>
+<p>Et il y a 9 canals de donné.</p>
+
+<table>
+<thead>
+<tr>
+<th>channel</th>
+<th>value</th>
+<th>function</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CH1</td>
+<td>0-255</td>
+<td>PAN</td>
+</tr>
+<tr>
+<td>CH1</td>
+<td>0-255</td>
+<td>PAN</td>
+</tr>
+<tr>
+<td>CH1</td>
+<td>0-255</td>
+<td>PAN</td>
+</tr>
+<tr>
+<td>CH1</td>
+<td>0-255</td>
+<td>PAN</td>
+</tr>
+<tr>
+<td>CH1</td>
+<td>0-255</td>
+<td>PAN</td>
+</tr>
+<tr>
+<td>CH1</td>
+<td>0-255</td>
+<td>PAN</td>
+</tr>
+</tbody>
+</table><h1 id="vi-implémentaion-de-projet-dmx">VI Implémentaion de projet DMX</h1>
+<h2 id="solution-i--application-avec-bibliothèque-ftdi">Solution I : Application avec bibliothèque FTDI</h2>
+<p>Tout à bord, il faut installer la bibliothèque <strong><em>libftdi</em></strong> et <strong><em>libusb</em></strong>（nécessaire pour <em>libftdi</em>) en mode <strong><em>bitbang</em></strong>. Au debut, j’ai installé le bibliothèque original de FTDI <strong><em>ftd2xx</em></strong> avec les command:</p>
+<blockquote>
+<p>sudo cp -r build/libftd2xx.so.1.4.6  /usr/local/lib<br>
+sudo ln -s /usr/local/lib/libftd2xx.so.1.4.6 /usr/local/lib/libftd2xx.so<br>
+sudo chmod 0755 /usr/local/lib/libftd2xx.so.1.4.6<br>
+sudo rmmod ftdi_sio<br>
+sudo rmmod usbserial</p>
+</blockquote>
+<p>En général, on place une librairie (ou un lien vers cette librairie) à un emplacement visible par tous les programmes qui sont susceptibles de l’utiliser. Typiquement dans :</p>
+<ul>
+<li>/usr/local/lib si la librairie est susceptible d’être utilisée par plusieurs utilisateurs ;</li>
+<li>~/lib si la librairie est susceptible d’être utilisée par un seul utilisateur.</li>
+</ul>
+<p>Dans le cas d’une librairie dynamique, il faudra penser à vérifier que la variable d’environnement LD_LIBRARY_PATH permettra aux programmes de trouver la nouvelle librairie.</p>
+<p>. La fonction de <em>ftd2xx</em>  <strong>FT_Write( )</strong> a une latency minimale de 1 ms. Mais pour produire la signal, il faut une fonction qui a une latency de 2 us. Donc il faut change un bibliothéque au niveau plus bas. Donc on ultilise un autre bibliothèque <a href="https://www.intra2net.com/en/developer/libftdi/index.php"><em>libftdi1</em> </a> de Intra2net.</p>
+<p>Il y a une problème en installant le bibliothèque: le bibliothèque <em>libftdi1</em> a besoin de une version de libusb-develop, mais il n’y a pas du bibliothèque libusb-develop pour l’OS Raspbian. Dans different version de libusb, quelque fonctions ont noms différents. Donc il faut renommer les fonctions de <em>libftdi1</em> correspondant à <em>libusb</em>. e.g. La fonction <em>ftdi_usb_open_dev()</em> appelle une fonction de libusb libusb_auto_detach_kernel_driver(), mais dans ce libusb la fonction s’appelle libusb_detach_kernel_driver().</p>
+<p>Dans étape d’initialisation de FTDI :</p>
+<pre class=" language-c"><code class="prism  language-c">    <span class="token function">ftdi_usb_open</span><span class="token punctuation">(</span>ftdi<span class="token punctuation">,</span> <span class="token number">0x0403</span><span class="token punctuation">,</span> <span class="token number">0x6001</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">// vid, pid of the ftdi device</span>
+    <span class="token function">ftdi_set_baudrate</span><span class="token punctuation">(</span>ftdi<span class="token punctuation">,</span> baudrate<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">// baudrate &gt; 2500000</span>
+    <span class="token function">ftdi_set_bitmode</span><span class="token punctuation">(</span>ftdi<span class="token punctuation">,</span> <span class="token number">0xFF</span><span class="token punctuation">,</span> BITMODE_BITBANG<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//set all pins to out bitbang mode</span>
+</code></pre>
+<p>图四</p>
+<p>Pour émettre une bit ‘1’, il faut mettre la sortie à haut. Pour une bit ‘0’, à bas. La fonction est send_one ou send_zero:</p>
+<pre class=" language-c"><code class="prism  language-c"><span class="token keyword">void</span> <span class="token function">send_one</span><span class="token punctuation">(</span><span class="token keyword">struct</span> ftdi_context <span class="token operator">*</span>ftdi<span class="token punctuation">,</span> <span class="token keyword">int</span> delay<span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">ftdi_write_data</span><span class="token punctuation">(</span>ftdi<span class="token punctuation">,</span> <span class="token operator">&amp;</span>zero<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span><span class="token string">"write failed for 1: %s\n"</span><span class="token punctuation">,</span> <span class="token function">ftdi_get_error_string</span><span class="token punctuation">(</span>ftdi<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">usleep</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>Pour émettre un packet de donnée:</p>
+<pre class=" language-c"><code class="prism  language-c"><span class="token keyword">void</span> <span class="token function">send_frame</span><span class="token punctuation">(</span><span class="token keyword">struct</span> ftdi_context <span class="token operator">*</span>ftdi<span class="token punctuation">,</span> <span class="token keyword">int</span> delay<span class="token punctuation">,</span> <span class="token keyword">int</span> frame<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token comment">//start bit</span>
+    <span class="token function">send_zero</span><span class="token punctuation">(</span>ftdi<span class="token punctuation">,</span> delay<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> i <span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span> <span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">BIT</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span>frame<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token function">send_one</span><span class="token punctuation">(</span>ftdi<span class="token punctuation">,</span> delay<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token keyword">else</span> <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">BIT</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span>red<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token function">send_zero</span><span class="token punctuation">(</span>ftdi<span class="token punctuation">,</span> delay<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">//2 stop bits</span>
+    <span class="token function">send_one</span><span class="token punctuation">(</span>ftdi<span class="token punctuation">,</span> delay<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">send_one</span><span class="token punctuation">(</span>ftdi<span class="token punctuation">,</span> delay<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>Pour émettre la signal série:</p>
+<pre class=" language-c"><code class="prism  language-c"><span class="token keyword">void</span> <span class="token function">send</span><span class="token punctuation">(</span><span class="token keyword">struct</span> ftdi_context <span class="token operator">*</span>ftdi<span class="token punctuation">,</span> <span class="token keyword">int</span> delay<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">int</span> i<span class="token punctuation">;</span>
+    <span class="token function">send_one</span><span class="token punctuation">(</span>ftdi<span class="token punctuation">,</span> delay<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token function">usleep</span><span class="token punctuation">(</span><span class="token number">1800</span><span class="token punctuation">)</span><span class="token punctuation">;</span>		<span class="token comment">//Mark Time Between Frames</span>
+    <span class="token function">send_zero</span><span class="token punctuation">(</span>ftdi<span class="token punctuation">,</span> delay<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token function">usleep</span><span class="token punctuation">(</span><span class="token number">176</span><span class="token punctuation">)</span><span class="token punctuation">;</span>		<span class="token comment">//break</span>
+    <span class="token function">send_one</span><span class="token punctuation">(</span>ftdi<span class="token punctuation">,</span> delay<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token function">usleep</span><span class="token punctuation">(</span><span class="token number">88</span><span class="token punctuation">)</span><span class="token punctuation">;</span>		<span class="token comment">//Mark-After-Break</span>
+    <span class="token function">send_frame</span><span class="token punctuation">(</span>ftdi <span class="token punctuation">,</span>delay <span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">send_frame</span><span class="token punctuation">(</span>ftdi <span class="token punctuation">,</span>delay <span class="token punctuation">,</span>pan<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">send_frame</span><span class="token punctuation">(</span>ftdi <span class="token punctuation">,</span>delay <span class="token punctuation">,</span>tilt<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">send_frame</span><span class="token punctuation">(</span>ftdi <span class="token punctuation">,</span>delay <span class="token punctuation">,</span>ctrl<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">send_frame</span><span class="token punctuation">(</span>ftdi <span class="token punctuation">,</span>delay <span class="token punctuation">,</span>red<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">send_frame</span><span class="token punctuation">(</span>ftdi <span class="token punctuation">,</span>delay <span class="token punctuation">,</span>green<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">send_frame</span><span class="token punctuation">(</span>ftdi <span class="token punctuation">,</span>delay <span class="token punctuation">,</span>blue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">send_frame</span><span class="token punctuation">(</span>ftdi <span class="token punctuation">,</span>delay <span class="token punctuation">,</span>white<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">send_frame</span><span class="token punctuation">(</span>ftdi <span class="token punctuation">,</span>delay <span class="token punctuation">,</span>speed<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">send_frame</span><span class="token punctuation">(</span>ftdi <span class="token punctuation">,</span>delay <span class="token punctuation">,</span>reset<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>Le architecture de logiciel est comme ci-dessous:</p>
+<div class="mermaid"><svg xmlns="http://www.w3.org/2000/svg" id="mermaid-svg-Fc2YghSgGlu5MjkE" height="100%" viewBox="0 0 180 330.01562118530273" style="max-width:180px;"><g><g class="output"><g class="clusters"></g><g class="edgePaths"><g class="edgePath" style="opacity: 1;"><path class="path" d="M80.5,79.47187461853028L80,103.97187423706055L80.5,129.47187576293942" marker-end="url(#arrowhead2278)" style="fill:none"></path><defs><marker id="arrowhead2278" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1px; stroke-dasharray: 1px, 0px;"></path></marker></defs></g><g class="edgePath" style="opacity: 1;"><path class="path" d="M65.18630593545801,190.2019286466396L37.5,230.01562118530273L37.5,255.01562118530273" marker-end="url(#arrowhead2279)" style="fill:none"></path><defs><marker id="arrowhead2279" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1px; stroke-dasharray: 1px, 0px;"></path></marker></defs></g><g class="edgePath" style="opacity: 1;"><path class="path" d="M95.8136952936683,190.2019304692712L122.5,230.01562118530273L122.5,255.01562118530273" marker-end="url(#arrowhead2280)" style="fill:none"></path><defs><marker id="arrowhead2280" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1px; stroke-dasharray: 1px, 0px;"></path></marker></defs></g></g><g class="edgeLabels"><g class="edgeLabel" style="opacity: 1;" transform=""><g transform="translate(0,0)" class="label"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" style="opacity: 1;" transform=""><g transform="translate(0,0)" class="label"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" style="opacity: 1;" transform=""><g transform="translate(0,0)" class="label"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;"><span class="edgeLabel"></span></div></foreignObject></g></g></g><g class="nodes"><g class="node" style="opacity: 1;" id="A" transform="translate(80,49.48593711853027)"><polygon points="29.485937500000002,0 58.971875000000004,-29.485937500000002 29.485937500000002,-58.971875000000004 0,-29.485937500000002" rx="5" ry="5" transform="translate(-29.485937500000002,29.485937500000002)"></polygon><g class="label" transform="translate(0,0)"><g transform="translate(-9.357421875,-7.5)"><foreignObject width="18.71484375" height="15"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">send</div></foreignObject></g></g></g><g class="node" style="opacity: 1;" id="B" transform="translate(80,166.99374771118164)"><polygon points="38.021875,0 76.04375,-38.021875 38.021875,-76.04375 0,-38.021875" rx="5" ry="5" transform="translate(-38.021875,38.021875)"></polygon><g class="label" transform="translate(0,0)"><g transform="translate(-20.02734375,-7.5)"><foreignObject width="40.0546875" height="15"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">send_data</div></foreignObject></g></g></g><g class="node" style="opacity: 1;" id="C" transform="translate(37.5,272.51562118530273)"><circle x="-12.61328125" y="-17.5" r="17.5"></circle><g class="label" transform="translate(0,0)"><g transform="translate(-2.61328125,-7.5)"><foreignObject width="5.2265625" height="15"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">1</div></foreignObject></g></g></g><g class="node" style="opacity: 1;" id="D" transform="translate(122.5,272.51562118530273)"><circle x="-12.61328125" y="-17.5" r="17.5"></circle><g class="label" transform="translate(0,0)"><g transform="translate(-2.61328125,-7.5)"><foreignObject width="5.2265625" height="15"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">0</div></foreignObject></g></g></g></g></g></g></svg></div>
+<p>( 中间填 send -&gt; send_frame -&gt; send_one / send_zero)</p>
+<p>Pour chaque fois d’exécution de programme, il faut d’abord décharger 2 modules de l’OS : ftdi_sio et usbserial.</p>
+<blockquote>
+<p>sudo rommed ftdi_sio<br>
+sudo rommed usbserial</p>
+</blockquote>
+<p>Pour changer les couleur de LED dans la boucle:</p>
+<pre class=" language-c"><code class="prism  language-c">        <span class="token keyword">if</span> <span class="token punctuation">(</span>red <span class="token operator">==</span> <span class="token number">255</span> <span class="token punctuation">)</span>    flag_r <span class="token operator">=</span> true<span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>red <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">)</span>      flag_r <span class="token operator">=</span> false<span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>flag_r<span class="token punctuation">)</span> red <span class="token operator">++</span><span class="token punctuation">;</span>
+        <span class="token keyword">else</span>        red <span class="token operator">--</span><span class="token punctuation">;</span>
+        <span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h2 id="solution-ii-un-driver-ultilisateur-de-linux--avec-bibliothèque-ftdi">Solution II: Un driver ultilisateur de linux  avec bibliothèque FTDI</h2>
+<p>La première étape est de créer un module noyau nomé <strong>dmx</strong> avec Cross-Compilateur, l’insérer puis l’effacer du noyau.</p>
+<pre class=" language-c"><code class="prism  language-c"><span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;linux/module.h&gt;</span></span>
+<span class="token macro property">#<span class="token directive keyword">include</span> <span class="token string">&lt;linux/init.h&gt;</span></span>
+<span class="token function">MODULE_LICENSE</span><span class="token punctuation">(</span><span class="token string">"GPL"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">MODULE_AUTHOR</span><span class="token punctuation">(</span><span class="token string">"hey there, 2018"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">MODULE_DESCRIPTION</span><span class="token punctuation">(</span><span class="token string">"Module, aussitot insere, aussitot efface"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> exit <span class="token function">mon_module_init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+	<span class="token function">printk</span><span class="token punctuation">(</span>KERN_DEBUG <span class="token string">"Hello World!\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> exit <span class="token function">mon_module_cleanup</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+	<span class="token function">printk</span><span class="token punctuation">(</span>KERN_DEBUG <span class="token string">"Goodbye World!\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token function">module_init</span><span class="token punctuation">(</span>mon_module_init<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">module_exit</span><span class="token punctuation">(</span>mon_module_cleanup<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>Puis, enregistre ce driver dans ce module en ajoutant la fonction d’enregistrement dans la fonction init du module avec la command <em>mknod</em>.</p>
+<p>Pour les exécuter :</p>
+<pre class=" language-c"><code class="prism  language-c"><span class="token keyword">struct</span> <span class="token keyword">int</span> <span class="token function">open_dmx</span><span class="token punctuation">(</span><span class="token keyword">struct</span> inode inode<span class="token punctuation">,</span> <span class="token keyword">struct</span> file file<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token comment">/*...*/</span>
+	<span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">struct</span> <span class="token keyword">int</span> <span class="token function">write_dmx</span><span class="token punctuation">(</span><span class="token keyword">struct</span> inode inode<span class="token punctuation">,</span> <span class="token keyword">struct</span> file file<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token comment">/*...*/</span>
+	<span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token keyword">return</span><span class="token operator">*</span><span class="token operator">*</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">struct</span> <span class="token keyword">int</span> <span class="token function">release_dmx</span><span class="token punctuation">(</span><span class="token keyword">struct</span> inode inode<span class="token punctuation">,</span> <span class="token keyword">struct</span> file file<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token comment">/*...*/</span>
+	<span class="token keyword">return</span><span class="token operator">*</span><span class="token operator">*</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">struct</span> file_operations fops_ledbp <span class="token operator">=</span><span class="token punctuation">{</span>
+	<span class="token punctuation">.</span>open <span class="token operator">=</span> open_dmx<span class="token punctuation">,</span>
+	<span class="token punctuation">.</span>write <span class="token operator">=</span> write_dmx<span class="token punctuation">,</span>
+	<span class="token punctuation">.</span>release <span class="token operator">=</span> release_dmx
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<h1 id="v-conclution">V Conclution</h1>
+</div>
+</body>
+
+</html>
